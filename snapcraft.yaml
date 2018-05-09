@@ -55,6 +55,10 @@ parts:
     source: https://github.com/matthiasclasen/portal-test.git
     meson-parameters:
       - --prefix=/
+    install: |
+        set -ex
+        mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui
+        sed -e '/DBusActivatable/d' < $SNAPCRAFT_PART_INSTALL/share/applications/org.gnome.PortalTest.desktop > $SNAPCRAFT_PART_INSTALL/meta/gui/portal-test.desktop
 
     build-packages:
       - gcc
