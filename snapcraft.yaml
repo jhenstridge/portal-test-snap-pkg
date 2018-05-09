@@ -1,5 +1,6 @@
 name: portal-test
 version: 1
+license: LGPL-2.1+
 summary: xdg-desktop-portal test application
 description: |
   This test application exercises the features of xdg-desktop-portal
