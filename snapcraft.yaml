@@ -1,5 +1,5 @@
 name: portal-test
-version: 1
+version: git
 license: LGPL-2.1+
 summary: xdg-desktop-portal test application
 description: |
@@ -7,12 +7,25 @@ description: |
 
 grade: devel
 confinement: strict
+base: core18
 
 plugs:
-  gnome-3-26-1604:
+  gnome-3-28-1804:
     interface: content
     target: $SNAP/gnome-platform
-    default-provider: gnome-3-26-1604:gnome-3-26-1604
+    default-provider: gnome-3-28-1804:gnome-3-28-1804
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
 
 slots:
   portal-test-dbus:
@@ -33,26 +46,39 @@ apps:
       - network
       - wayland
       - x11
-      - gnome-3-26-1604
+      - gnome-3-28-1804
     slots:
       - portal-test-dbus
 
 parts:
-  gnome-3-26-ppa:
-    plugin: nil
-    prepare: |
-      set -ex
-      apt-get install -y software-properties-common
-      add-apt-repository -y ppa:ubuntu-desktop/gnome-3-26
-      apt-get update
-      apt-get dist-upgrade -y
+  glib:
+    source: https://gitlab.gnome.org/GNOME/glib.git
+    #source-branch: glib-2-56
+    configflags: [ --prefix=/usr ]
+    plugin: autotools
+    build-packages:
+      - automake
+      - autoconf
+      - autotools-dev
+      - libtool
+      - libmount-dev
+
+  desktop-gnome-platform:
+    after: [glib]
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - build-essential
+      - libgtk-3-dev
+      - libffi-dev
+    override-build: |
+      snapcraftctl build
+      mkdir -pv $SNAPCRAFT_PART_INSTALL/gnome-platform
 
   portal-test:
-    build-attributes:
-      - no-system-libraries
-    after:
-      - gnome-3-26-ppa
-      - desktop-gnome-platform
+    after: [desktop-gnome-platform]
     plugin: meson
     source: https://github.com/matthiasclasen/portal-test.git
     meson-parameters:
