@@ -1,6 +1,7 @@
 name: portal-test
 version: git
-license: LGPL-2.1+
+passthrough:
+  license: LGPL-2.1+
 summary: xdg-desktop-portal test application
 description: |
   This test application exercises the features of xdg-desktop-portal
